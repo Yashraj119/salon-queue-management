@@ -36,3 +36,4 @@ Details:
 - Mobile-first, checked at 375px, 768px and 1920px.
 
 List changed files and tell me how to preview each of the 7 pages.
+4. what does thee waiting room does why cant i exit it

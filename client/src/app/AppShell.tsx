@@ -35,11 +35,11 @@ function Brand() {
   );
 }
 
-function ScreensTaskbar() {
+function ScreensTaskbar({ display = false }: { display?: boolean }) {
   if (!import.meta.env.DEV) return null;
 
   return (
-    <nav className="screens-taskbar" aria-label={strings.navigation}>
+    <nav className={`screens-taskbar${display ? ' screens-taskbar-display' : ''}`} aria-label={strings.navigation}>
       {pageLinks.map(({ to, key }) => (
         <NavLink key={key} to={to} end={to === '/'}>
           {strings[key]}
@@ -79,6 +79,7 @@ export function AppShell() {
     return (
       <div className="app-canvas display-canvas">
         <Outlet />
+        <ScreensTaskbar display />
       </div>
     );
   }
