@@ -93,13 +93,17 @@ summary:focus-visible {
 
 .customer-header-inner,
 .staff-header-inner {
-  display: flex;
   width: min(100% - 40px, 1320px);
-  min-height: 76px;
   margin-inline: auto;
+  padding-block: 11px 0;
+}
+
+.customer-header-top,
+.staff-header-top {
+  display: flex;
+  min-height: 49px;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
 }
 
 .brand-lockup {
@@ -149,66 +153,40 @@ summary:focus-visible {
   line-height: 1;
 }
 
-.screens-menu {
-  position: relative;
-  z-index: 10;
+.screens-taskbar {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  border-top: 1px solid rgb(230 199 114 / 11%);
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
-.screens-menu summary {
-  display: flex;
-  min-width: 80px;
-  align-items: center;
-  justify-content: center;
-  padding-inline: 15px;
-  border: 1px solid rgb(230 199 114 / 20%);
-  border-radius: 999px;
-  color: var(--color-taupe);
-  cursor: pointer;
-  font-size: 11px;
-  letter-spacing: 0.13em;
-  list-style: none;
-  text-transform: uppercase;
-  transition: border-color 240ms ease-out, color 240ms ease-out, background-color 240ms ease-out;
-}
-
-.screens-menu summary::-webkit-details-marker {
+.screens-taskbar::-webkit-scrollbar {
   display: none;
 }
 
-.screens-menu summary:hover,
-.screens-menu[open] summary {
-  border-color: rgb(230 199 114 / 46%);
-  background: rgb(230 199 114 / 5%);
-  color: var(--color-champagne-highlight);
-}
-
-.screens-menu-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  display: grid;
-  min-width: 220px;
-  padding: 8px;
-  border: 1px solid rgb(230 199 114 / 18%);
-  border-radius: 18px;
-  background: var(--color-espresso);
-  box-shadow: 0 20px 50px rgb(0 0 0 / 42%);
-}
-
-.screens-menu-panel a {
+.screens-taskbar a {
   display: flex;
+  flex: 0 0 auto;
+  min-height: 44px;
   align-items: center;
-  padding: 0 13px;
-  border-radius: 11px;
+  justify-content: center;
+  padding-inline: 12px;
+  border-bottom: 1px solid transparent;
   color: var(--color-taupe);
-  font-size: 13px;
-  transition: background-color 220ms ease-out, color 220ms ease-out;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  white-space: nowrap;
+  transition: border-color 240ms ease-out, color 240ms ease-out;
 }
 
-.screens-menu-panel a:hover,
-.screens-menu-panel a.active {
-  background: rgb(230 199 114 / 9%);
+.screens-taskbar a:hover,
+.screens-taskbar a.active {
+  border-bottom-color: var(--color-champagne-primary);
   color: var(--color-champagne-highlight);
 }
 
@@ -265,7 +243,11 @@ summary:focus-visible {
 }
 
 .staff-header-inner {
-  min-height: 68px;
+  padding-top: 8px;
+}
+
+.staff-header-top {
+  min-height: 47px;
 }
 
 .staff-heading-wrap {
@@ -377,12 +359,6 @@ summary:focus-visible {
     var(--color-ink);
 }
 
-.display-canvas > .screens-menu {
-  position: absolute;
-  top: 24px;
-  right: 28px;
-}
-
 .screen-card-display {
   display: flex;
   min-height: min(68vh, 660px);
@@ -441,7 +417,10 @@ summary:focus-visible {
 @media (max-width: 640px) {
   .customer-header-inner {
     width: calc(100% - 32px);
-    min-height: 68px;
+  }
+
+  .customer-header-top {
+    min-height: 47px;
   }
 
   .brand-name {
@@ -464,7 +443,10 @@ summary:focus-visible {
 
   .staff-header-inner {
     width: calc(100% - 32px);
-    min-height: 64px;
+  }
+
+  .staff-header-top {
+    min-height: 44px;
   }
 
   .staff-heading-wrap {

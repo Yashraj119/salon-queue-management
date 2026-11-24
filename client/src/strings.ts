@@ -1,7 +1,6 @@
 export const strings = {
   brand: 'Salon Queue',
-  devScreens: 'Screens',
-  navigation: 'Screen navigation',
+  navigation: 'Page navigation',
   staffBadge: 'STAFF',
   ornament: 'Decorative divider',
   home: 'Home',

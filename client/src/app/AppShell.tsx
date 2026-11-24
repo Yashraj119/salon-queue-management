@@ -35,20 +35,17 @@ function Brand() {
   );
 }
 
-function ScreensMenu() {
+function ScreensTaskbar() {
   if (!import.meta.env.DEV) return null;
 
   return (
-    <details className="screens-menu">
-      <summary>{strings.devScreens}</summary>
-      <nav className="screens-menu-panel" aria-label={strings.navigation}>
-        {pageLinks.map(({ to, key }) => (
-          <NavLink key={key} to={to} end={to === '/'}>
-            {strings[key]}
-          </NavLink>
-        ))}
-      </nav>
-    </details>
+    <nav className="screens-taskbar" aria-label={strings.navigation}>
+      {pageLinks.map(({ to, key }) => (
+        <NavLink key={key} to={to} end={to === '/'}>
+          {strings[key]}
+        </NavLink>
+      ))}
+    </nav>
   );
 }
 
@@ -91,11 +88,13 @@ export function AppShell() {
       <div className="app-canvas staff-canvas">
         <header className="staff-header">
           <div className="staff-header-inner">
-            <div className="staff-heading-wrap">
-              <h1 className="staff-heading">{strings[pageKey]}</h1>
-              <span className="staff-badge">{strings.staffBadge}</span>
+            <div className="staff-header-top">
+              <div className="staff-heading-wrap">
+                <h1 className="staff-heading">{strings[pageKey]}</h1>
+                <span className="staff-badge">{strings.staffBadge}</span>
+              </div>
             </div>
-            <ScreensMenu />
+            <ScreensTaskbar />
           </div>
         </header>
         <main className="page-main staff-main"><Outlet /></main>
@@ -107,8 +106,8 @@ export function AppShell() {
     <div className="app-canvas customer-canvas">
       <header className="customer-header">
         <div className="customer-header-inner">
-          <Brand />
-          <ScreensMenu />
+          <div className="customer-header-top"><Brand /></div>
+          <ScreensTaskbar />
         </div>
       </header>
       <main className="page-main customer-main"><Outlet /></main>
