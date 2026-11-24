@@ -6,9 +6,10 @@ import { activeQueueStatuses } from '../queue/queueRules.js';
 
 const moduleDirectory = dirname(fileURLToPath(import.meta.url));
 const defaultDatabasePath = resolve(moduleDirectory, '../../data/salon-queue.sqlite');
-mkdirSync(dirname(defaultDatabasePath), { recursive: true });
+const databasePath = process.env.DATABASE_PATH ?? defaultDatabasePath;
+mkdirSync(dirname(databasePath), { recursive: true });
 
-export const database = new DatabaseSync(process.env.DATABASE_PATH ?? defaultDatabasePath);
+export const database = new DatabaseSync(databasePath);
 database.exec('PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;');
 
 export function withTransaction<T>(action: () => T): T {
