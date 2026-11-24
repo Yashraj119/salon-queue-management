@@ -4,6 +4,7 @@ import { strings } from '../strings';
 import type { PageKey } from '../strings';
 import { socket } from '../realtime/socket';
 import { useEffect } from 'react';
+import { StaffPinGate } from '../components/StaffPinGate';
 
 const pageLinks: { to: string; key: PageKey }[] = [
   { to: '/', key: 'home' },
@@ -98,7 +99,7 @@ export function AppShell() {
             <ScreensTaskbar />
           </div>
         </header>
-        <main className="page-main staff-main"><Outlet /></main>
+        <main className="page-main staff-main"><StaffPinGate><Outlet /></StaffPinGate></main>
       </div>
     );
   }

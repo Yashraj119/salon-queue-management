@@ -44,6 +44,8 @@ export type QueueEntryRequest = {
   barberId: string | null;
 };
 
+import { apiUrl } from './config';
+
 export class ApiError extends Error {
   constructor(
     readonly code: string,
@@ -54,12 +56,10 @@ export class ApiError extends Error {
   }
 }
 
-const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/+$/, '');
-
 async function requestJson<T>(url: string, options?: RequestInit): Promise<T> {
   let response: Response;
   try {
-    response = await fetch(`${apiBaseUrl}${url}`, {
+    response = await fetch(apiUrl(url), {
       ...options,
       headers: { 'Content-Type': 'application/json', ...options?.headers },
     });

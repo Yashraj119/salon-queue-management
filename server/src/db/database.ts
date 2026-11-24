@@ -57,8 +57,11 @@ database.exec(`
     customer_name TEXT NOT NULL,
     phone TEXT NOT NULL,
     barber_id TEXT REFERENCES barbers(id),
+    called_barber_id TEXT REFERENCES barbers(id),
     status TEXT NOT NULL DEFAULT 'Waiting',
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    called_at TEXT,
+    started_at TEXT
   );
 
   CREATE TABLE IF NOT EXISTS queue_entry_services (
@@ -71,6 +74,13 @@ database.exec(`
     PRIMARY KEY(queue_id, service_id)
   );
 `);
+
+const queueColumns = new Set((database.prepare('PRAGMA table_info(queue_entries)').all() as { name: string }[]).map((column) => column.name));
+if (!queueColumns.has('called_barber_id')) {
+  database.exec('ALTER TABLE queue_entries ADD COLUMN called_barber_id TEXT REFERENCES barbers(id)');
+}
+if (!queueColumns.has('called_at')) database.exec('ALTER TABLE queue_entries ADD COLUMN called_at TEXT');
+if (!queueColumns.has('started_at')) database.exec('ALTER TABLE queue_entries ADD COLUMN started_at TEXT');
 
 const activeStatusSql = activeQueueStatuses.map((status) => `'${status.replaceAll("'", "''")}'`).join(', ');
 database.exec(`

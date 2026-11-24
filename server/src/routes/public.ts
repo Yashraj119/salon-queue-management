@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Request, RequestHandler, Response } from 'express';
 import type { Server } from 'socket.io';
 import { database, withTransaction } from '../db/database.js';
 import { activeQueueStatuses } from '../queue/queueRules.js';
@@ -59,7 +59,7 @@ function formatClock(minutes: number): string {
   return `${hour12}:${minuteText} ${meridiem}`;
 }
 
-function getPublicState() {
+export function getPublicState() {
   const settings = database.prepare('SELECT * FROM salon_settings WHERE id = 1').get() as SettingsRow;
   const barbers = database.prepare(
     'SELECT id, name, status, is_on_duty, photo_url FROM barbers WHERE is_on_duty = 1 ORDER BY name',
@@ -114,28 +114,8 @@ function sendValidationError(response: Response, field: string, code: string) {
   response.status(400).json({ error: 'validation_error', field, code });
 }
 
-export function createPublicRouter(io: Server) {
-  const router = Router();
-
-  router.get('/home', (_request, response) => {
-    response.json(getPublicState());
-  });
-
-  router.get('/catalog', (_request, response) => {
-    const services = database.prepare(`
-      SELECT id, name_en, name_gu, duration_minutes, price_rupees
-      FROM services WHERE is_available = 1 ORDER BY id
-    `).all() as ServiceRow[];
-    response.json({ ...getPublicState(), services: services.map((service) => ({
-      id: service.id,
-      nameEn: service.name_en,
-      nameGu: service.name_gu,
-      durationMinutes: service.duration_minutes,
-      priceRupees: service.price_rupees,
-    })) });
-  });
-
-  router.post('/queue-entries', (request: Request, response: Response) => {
+export function createQueueEntryHandler(io: Server, allowWalkInsWhenClosed = false): RequestHandler {
+  return (request: Request, response: Response) => {
     const body = (request.body && typeof request.body === 'object' ? request.body : {}) as {
       name?: unknown;
       phone?: unknown;
@@ -185,10 +165,10 @@ export function createPublicRouter(io: Server) {
     }
 
     const publicState = getPublicState();
-    if (!publicState.onlineJoiningOpen) {
+    if (!allowWalkInsWhenClosed && !publicState.onlineJoiningOpen) {
       return response.status(403).json({ error: 'queue_closed' });
     }
-    if (publicState.workingBarberCount === 0) {
+    if (!allowWalkInsWhenClosed && publicState.workingBarberCount === 0) {
       return response.status(409).json({ error: 'no_barber_available' });
     }
     if (barberId !== null && !publicState.barbers.some((barber) => barber.id === barberId)) {
@@ -234,7 +214,31 @@ export function createPublicRouter(io: Server) {
       duplicate: false,
       entry: { id, token: created.token, status: 'Waiting', position: getPosition({ sequence: created.sequence, status: 'Waiting' }) },
     });
+  };
+}
+
+export function createPublicRouter(io: Server) {
+  const router = Router();
+
+  router.get('/home', (_request, response) => {
+    response.json(getPublicState());
   });
+
+  router.get('/catalog', (_request, response) => {
+    const services = database.prepare(`
+      SELECT id, name_en, name_gu, duration_minutes, price_rupees
+      FROM services WHERE is_available = 1 ORDER BY id
+    `).all() as ServiceRow[];
+    response.json({ ...getPublicState(), services: services.map((service) => ({
+      id: service.id,
+      nameEn: service.name_en,
+      nameGu: service.name_gu,
+      durationMinutes: service.duration_minutes,
+      priceRupees: service.price_rupees,
+    })) });
+  });
+
+  router.post('/queue-entries', createQueueEntryHandler(io));
 
   return router;
 }

@@ -4,6 +4,7 @@ import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { healthRouter } from './routes/health.js';
 import { createPublicRouter } from './routes/public.js';
+import { createStaffRouter } from './routes/staff.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -24,6 +25,7 @@ export const io = new Server(httpServer, {
 });
 
 app.use('/api', createPublicRouter(io));
+app.use('/api/staff', createStaffRouter(io));
 
 io.on('connection', (socket) => {
   socket.emit('connection:ready');

@@ -1,5 +1,6 @@
 # Salon Queue Management
 **Live demo:** `<url>`
+**Staff test PIN:** `1234` (local default; set `STAFF_PIN` to a private value in deployment)
 
 Replace `<url>` with the production Vercel URL after the first successful deployment.
 
@@ -34,6 +35,7 @@ Set these service variables. You can leave `WEB_ORIGIN` unset for this initial b
 | `HOST` | `0.0.0.0` |
 | `DATABASE_PATH` | The persistent volume path described below, ending in `salon-queue.sqlite` |
 | `WEB_ORIGIN` | The exact Vercel production origin, such as `https://your-project.vercel.app` (no trailing slash) |
+| `STAFF_PIN` | A private staff PIN for the deployed API; local default is `1234` |
 
 The platform provides `PORT`; the server reads it automatically. Do not set a fixed port in production.
 
