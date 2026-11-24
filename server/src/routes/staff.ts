@@ -285,7 +285,7 @@ export function createStaffRouter(io: Server) {
     const result = withTransaction(() => {
       const barber = database.prepare('SELECT id, is_on_duty FROM barbers WHERE id = ?').get(barberId) as Pick<BarberRow, 'id' | 'is_on_duty'> | undefined;
       if (!barber || barber.is_on_duty !== 1) return { error: 'barber_unavailable' as const, status: 404 };
-      if (status === 'On break' && getCurrentForBarber(barberId)) return { error: 'barber_occupied' as const, status: 409 };
+      if (getCurrentForBarber(barberId)) return { error: 'barber_occupied' as const, status: 409 };
       database.prepare('UPDATE barbers SET status = ? WHERE id = ?').run(status, barberId);
       return { updated: true } as const;
     });

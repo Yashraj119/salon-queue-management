@@ -275,7 +275,13 @@ export function createPublicRouter(io: Server) {
     `).all() as Array<{ queue_id: string; minutes: number }>;
     const durations = new Map(serviceDurations.map((row) => [row.queue_id, row.minutes]));
     const workingBarberCount = barbers.filter((barber) => barber.status !== 'On break').length;
-    let minutesAhead = 0;
+    const activeMinutes = (database.prepare(`
+      SELECT COALESCE(SUM(qs.duration_minutes), 0) AS minutes
+      FROM queue_entry_services qs
+      INNER JOIN queue_entries q ON q.id = qs.queue_id
+      WHERE q.status IN ('Called', 'In chair')
+    `).get() as { minutes: number }).minutes;
+    let minutesAhead = activeMinutes;
     const upNext = waiting.slice(0, 5).map((entry) => {
       const estimatedMinutes = workingBarberCount > 0 ? Math.ceil(minutesAhead / workingBarberCount) : null;
       minutesAhead += durations.get(entry.id) ?? 0;
