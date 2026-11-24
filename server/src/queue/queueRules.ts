@@ -18,3 +18,5 @@ export function canTransitionQueueStatus(from: QueueStatus, to: QueueStatus): bo
 export function isActiveQueueStatus(status: QueueStatus): boolean {
   return status === 'Waiting' || status === 'Called' || status === 'In chair';
 }
+
+export const activeQueueStatuses = queueStatuses.filter(isActiveQueueStatus);

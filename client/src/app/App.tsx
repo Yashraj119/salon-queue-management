@@ -1,13 +1,15 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './AppShell';
+import { HomePage } from './HomePage';
+import { JoinQueuePage } from './JoinQueuePage';
 import { ScreenPage } from './ScreenPage';
 
 export function App() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route path="/" element={<ScreenPage pageKey="home" />} />
-        <Route path="/join" element={<ScreenPage pageKey="join" />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/join" element={<JoinQueuePage />} />
         <Route path="/status/:id" element={<ScreenPage pageKey="status" />} />
         <Route path="/reception" element={<ScreenPage pageKey="reception" />} />
         <Route path="/barber/:name" element={<ScreenPage pageKey="barber" />} />

@@ -3,6 +3,7 @@ import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { healthRouter } from './routes/health.js';
+import { createPublicRouter } from './routes/public.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -16,6 +17,8 @@ app.use('/api/health', healthRouter);
 export const io = new Server(httpServer, {
   cors: { origin: webOrigin },
 });
+
+app.use('/api', createPublicRouter(io));
 
 io.on('connection', (socket) => {
   socket.emit('connection:ready');

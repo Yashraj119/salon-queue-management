@@ -112,7 +112,6 @@ export function AppShell() {
         </div>
       </header>
       <main className="page-main customer-main"><Outlet /></main>
-      <div className="mobile-action-bar" aria-hidden="true" />
     </div>
   );
 }

@@ -12,4 +12,4 @@ The Express API owns shared application data in SQLite using Node's built-in SQL
 
 ## Routes
 
-`/`, `/join`, `/status/:id`, `/reception`, `/barber/:name`, `/display`, and `/admin` are scaffolded as themed page shells. Screen workflows are not implemented yet.
+`/` (Home) and `/join` are implemented with live SQLite-backed salon data. `/status/:id`, `/reception`, `/barber/:name`, `/display`, and `/admin` remain themed placeholders for later steps.
