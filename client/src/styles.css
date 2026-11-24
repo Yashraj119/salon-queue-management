@@ -2269,3 +2269,143 @@ summary:focus-visible {
     animation: none;
   }
 }
+
+/* Barber phone view */
+.barber-view-page {
+  display: grid;
+  width: min(100%, 620px);
+  gap: 16px;
+  margin-inline: auto;
+}
+
+.barber-view-heading,
+.barber-view-identity,
+.barber-availability-pill,
+.barber-current-main,
+.barber-timer-row,
+.barber-timer-row span,
+.barber-next-entry {
+  display: flex;
+  align-items: center;
+}
+
+.barber-view-heading {
+  justify-content: space-between;
+  gap: 14px;
+  padding: 4px 2px 10px;
+}
+
+.barber-view-identity { gap: 15px; }
+.barber-view-identity h2 { margin: 4px 0 0; color: var(--color-ivory); font: 500 32px/1 'Cormorant Garamond', Georgia, serif; }
+.barber-availability-pill { gap: 8px; padding: 9px 12px; border: 1px solid rgb(230 199 114 / 20%); border-radius: 999px; color: var(--color-champagne-highlight); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.barber-availability-pill .status-dot { width: 7px; height: 7px; }
+.barber-availability-pill.is-on-break { color: #e2a18a; border-color: rgb(184 117 93 / 30%); }
+.barber-availability-pill.is-on-break .status-dot { background: #b8755d; }
+.barber-current-card,
+.barber-next-card { display: grid; gap: 17px; padding: clamp(21px, 6vw, 30px); }
+.barber-current-main { gap: 17px; min-width: 0; padding-block: 4px 9px; }
+.barber-token { flex: 0 0 auto; color: var(--color-champagne-highlight); font: 500 clamp(42px, 12vw, 62px)/1 'Cormorant Garamond', Georgia, serif; }
+.barber-customer-copy { min-width: 0; }
+.barber-customer-copy h3,
+.barber-next-entry h3 { overflow: hidden; margin: 0; color: var(--color-ivory); font: 500 clamp(23px, 7vw, 30px)/1.1 'Cormorant Garamond', Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+.barber-customer-copy p,
+.barber-next-entry p { overflow: hidden; margin: 7px 0 0; color: var(--color-taupe); font-size: 12px; line-height: 1.5; text-overflow: ellipsis; }
+.barber-timer-row { justify-content: space-between; min-height: 51px; padding-top: 13px; border-top: 1px solid rgb(230 199 114 / 15%); color: var(--color-taupe); }
+.barber-timer-row span { gap: 8px; font-size: 11px; }
+.barber-timer-row strong { color: var(--color-champagne-highlight); font: 500 25px/1 'Cormorant Garamond', Georgia, serif; font-variant-numeric: tabular-nums; }
+.barber-service-action { display: flex; width: 100%; min-height: 62px; align-items: center; justify-content: center; gap: 12px; margin-top: 2px; font-size: 14px; }
+.barber-service-action.is-start { background: linear-gradient(135deg, #e6c772, #d4a017 65%, #b8860b); }
+.barber-empty-current { display: grid; min-height: 138px; place-content: center; justify-items: center; gap: 13px; color: var(--color-taupe); text-align: center; }
+.barber-empty-current svg { color: var(--color-champagne-primary); }
+.barber-empty-current p,.barber-next-empty { margin: 0; color: var(--color-taupe); font-size: 12px; line-height: 1.5; }
+.barber-next-entry { gap: 16px; padding-top: 12px; border-top: 1px solid rgb(230 199 114 / 15%); }
+.barber-next-entry > strong { color: var(--color-champagne-highlight); font: 500 30px/1 'Cormorant Garamond', Georgia, serif; }
+.barber-next-entry > div { min-width: 0; }
+.barber-break-toggle { display: flex; min-height: 54px; align-items: center; justify-content: center; gap: 10px; border: 1px solid rgb(230 199 114 / 28%); border-radius: 16px; background: rgb(26 21 18 / 78%); color: var(--color-champagne-highlight); cursor: pointer; font: 500 11px 'Inter', sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.barber-break-toggle.is-return { border-color: rgb(126 173 134 / 30%); color: #b9d5b4; }
+.barber-break-toggle:disabled { cursor: not-allowed; opacity: .45; }
+.barber-break-note,.barber-view-error { margin: 0; color: var(--color-taupe); font-size: 11px; line-height: 1.5; text-align: center; }
+.barber-view-error { color: #e2a18a; }
+.barber-view-state { display: grid; min-height: 190px; place-content: center; justify-items: center; gap: 15px; color: var(--color-ivory); text-align: center; }
+
+/* Customer phone status used by the barber actions */
+.customer-status-page { display: grid; width: min(100%, 760px); gap: 24px; margin-inline: auto; }
+.customer-status-heading { display: grid; gap: 12px; text-align: center; }
+.customer-status-heading .eyebrow { justify-content: center; gap: 8px; }
+.customer-status-heading h1 { margin: 0; color: var(--color-champagne-highlight); font: 500 clamp(56px, 16vw, 100px)/.95 'Cormorant Garamond', Georgia, serif; }
+.customer-status-card { position: relative; display: grid; justify-items: center; gap: 17px; padding: clamp(25px, 7vw, 45px); text-align: center; }
+.customer-status-token { color: var(--color-champagne-highlight); font: 500 clamp(48px, 14vw, 78px)/.95 'Cormorant Garamond', Georgia, serif; }
+.customer-status-live { display: flex; align-items: center; gap: 8px; color: var(--color-taupe); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.customer-status-live .status-dot { width: 7px; height: 7px; }
+.customer-status-live .status-dot.is-offline { background: #b8755d; box-shadow: none; }
+.customer-status-card h2 { max-width: 580px; margin: 0; color: var(--color-ivory); font: 400 clamp(25px, 7vw, 38px)/1.2 'Cormorant Garamond', Georgia, serif; }
+.customer-status-detail { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--color-taupe); font-size: 12px; }
+.customer-status-break { margin: 0; color: var(--color-champagne-highlight); font-size: 12px; }
+.customer-status-services { display: grid; gap: 7px; width: 100%; padding-top: 16px; border-top: 1px solid rgb(230 199 114 / 14%); color: var(--color-taupe); font-size: 11px; }
+.customer-status-services strong { color: var(--color-ivory); font-weight: 500; }
+.customer-status-check { color: var(--color-champagne-highlight); }
+.customer-status-error { color: #e2a18a; font-size: 11px; text-align: center; }
+.customer-status-error button { border: 0; background: transparent; color: var(--color-champagne-highlight); text-decoration: underline; cursor: pointer; }
+
+/* Full-screen landscape waiting room display */
+.display-canvas { display: block; min-height: 100svh; padding: clamp(22px, 3.2vw, 64px); }
+.tv-board { display: grid; width: 100%; min-height: calc(100svh - clamp(44px, 6.4vw, 128px)); grid-template-rows: auto 1fr auto; gap: clamp(22px, 3vw, 48px); color: var(--color-ivory); }
+.tv-header { display: flex; align-items: end; justify-content: space-between; gap: 25px; padding-bottom: 22px; border-bottom: 1px solid rgb(230 199 114 / 26%); }
+.tv-header h1 { margin: 5px 0 0; color: var(--color-champagne-highlight); font: 400 clamp(42px, 5vw, 76px)/.96 'Cormorant Garamond', Georgia, serif; }
+.tv-kicker { display: flex; align-items: center; gap: 10px; margin: 0; color: var(--color-champagne-primary); font-size: clamp(10px, 1vw, 15px); font-weight: 500; letter-spacing: .17em; text-transform: uppercase; }
+.tv-live-state { display: flex; align-items: center; gap: 10px; color: var(--color-taupe); font-size: clamp(10px, .9vw, 14px); letter-spacing: .12em; text-transform: uppercase; }
+.tv-live-state .status-dot { width: 8px; height: 8px; }
+.tv-live-state.is-offline { color: #e2a18a; }
+.tv-live-state.is-offline .status-dot { background: #b8755d; box-shadow: none; }
+.tv-content { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr); align-items: stretch; gap: clamp(24px, 3vw, 56px); }
+.tv-barber-list { display: grid; align-content: start; gap: clamp(13px, 1.4vw, 22px); }
+.tv-barber-row { display: grid; min-height: clamp(108px, 13vh, 142px); grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(14px, 2vw, 32px); padding: clamp(15px, 2vw, 30px); border: 1px solid rgb(230 199 114 / 20%); border-radius: 24px; background: linear-gradient(105deg, rgb(26 21 18 / 98%), rgb(33 27 21 / 90%)); box-shadow: 0 18px 44px rgb(0 0 0 / 25%); }
+.tv-barber-row .barber-avatar { width: clamp(64px, 6.2vw, 98px); height: clamp(64px, 6.2vw, 98px); border-radius: 50%; }
+.tv-barber-name { min-width: 0; }
+.tv-barber-name h2 { overflow: hidden; margin: 0; color: var(--color-ivory); font: 500 clamp(29px, 3vw, 46px)/1 'Cormorant Garamond', Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+.tv-barber-name span { display: block; margin-top: 8px; color: var(--color-taupe); font-size: clamp(10px, .85vw, 14px); letter-spacing: .12em; text-transform: uppercase; }
+.tv-now-value { display: grid; min-width: clamp(116px, 11vw, 172px); justify-items: end; gap: 3px; }
+.tv-now-value > span { color: var(--color-taupe); font-size: clamp(10px, .8vw, 13px); letter-spacing: .15em; text-transform: uppercase; }
+.tv-now-value > strong { color: var(--color-champagne-highlight); font: 500 clamp(38px, 4.1vw, 64px)/.95 'Cormorant Garamond', Georgia, serif; }
+.tv-now-value.is-flashing { animation: tv-gold-flash .75s ease-in-out infinite alternate; }
+@keyframes tv-gold-flash { from { color: var(--color-champagne-highlight); filter: drop-shadow(0 0 0 rgb(230 199 114 / 0%)); } to { color: #fff1ba; filter: drop-shadow(0 0 20px rgb(230 199 114 / 80%)); } }
+.tv-next-panel { display: grid; align-content: start; gap: 20px; padding: clamp(21px, 2.5vw, 38px); border: 1px solid rgb(230 199 114 / 22%); border-radius: 26px; background: linear-gradient(145deg, rgb(26 21 18 / 96%), rgb(17 14 12 / 96%)); }
+.tv-next-heading h2 { margin: 8px 0 0; color: var(--color-ivory); font: 400 clamp(32px, 3.3vw, 52px)/1 'Cormorant Garamond', Georgia, serif; }
+.tv-next-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.tv-next-row { display: grid; min-height: clamp(74px, 9vh, 98px); grid-template-columns: clamp(35px, 3vw, 48px) minmax(90px, .75fr) minmax(120px, 1fr); align-items: center; gap: 14px; border-top: 1px solid rgb(230 199 114 / 13%); }
+.tv-next-rank { color: var(--color-taupe); font: 400 clamp(18px, 1.5vw, 24px) 'Cormorant Garamond', Georgia, serif; }
+.tv-next-token { color: var(--color-champagne-highlight); font: 500 clamp(31px, 2.9vw, 45px)/1 'Cormorant Garamond', Georgia, serif; }
+.tv-next-estimate { color: var(--color-taupe); font-size: clamp(12px, 1vw, 16px); text-align: right; }
+.tv-empty,.tv-wait-note,.tv-loading { margin: 0; color: var(--color-taupe); font-size: clamp(14px, 1.25vw, 20px); }
+.tv-error { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 13px 17px; border: 1px solid rgb(184 117 93 / 30%); border-radius: 14px; color: #e2a18a; font-size: 14px; }
+.tv-error button { min-height: 44px; padding-inline: 17px; border: 1px solid rgb(230 199 114 / 35%); border-radius: 10px; background: transparent; color: var(--color-champagne-highlight); cursor: pointer; }
+.tv-footer { display: flex; justify-content: space-between; padding-top: 15px; border-top: 1px solid rgb(230 199 114 / 15%); color: var(--color-taupe); font-size: clamp(9px, .8vw, 13px); letter-spacing: .16em; text-transform: uppercase; }
+
+@media (max-width: 760px) {
+  .tv-content { grid-template-columns: minmax(0, 1fr); }
+  .tv-next-panel { order: -1; }
+  .tv-header { align-items: start; }
+  .tv-live-state { max-width: 43%; justify-content: end; text-align: right; line-height: 1.4; }
+  .tv-barber-row { min-height: 88px; border-radius: 17px; }
+  .tv-barber-row .barber-avatar { width: 53px; height: 53px; }
+  .tv-barber-name h2 { font-size: 27px; }
+  .tv-now-value { min-width: 84px; }
+  .tv-now-value > strong { font-size: 33px; }
+  .tv-next-row { min-height: 65px; }
+  .tv-next-estimate { font-size: 11px; }
+}
+
+@media (max-width: 420px) {
+  .barber-view-heading { align-items: start; flex-direction: column; }
+  .barber-availability-pill { align-self: flex-start; }
+  .tv-next-panel { padding: 17px; }
+  .tv-next-row { grid-template-columns: 25px minmax(72px, .7fr) minmax(88px, 1fr); gap: 8px; }
+  .tv-next-token { font-size: 27px; }
+}
+
+@media (min-width: 1500px) and (min-height: 900px) {
+  .tv-board { gap: 34px; }
+  .tv-barber-list { gap: 22px; }
+  .tv-barber-row { min-height: 150px; }
+  .tv-next-row { min-height: 104px; }
+}

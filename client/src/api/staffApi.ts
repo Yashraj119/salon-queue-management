@@ -37,6 +37,18 @@ export type ReceptionData = {
   barbers: StaffBarberCard[];
 };
 
+export type BarberViewData = {
+  barber: {
+    id: string;
+    name: string;
+    status: 'Available' | 'Busy' | 'On break';
+    photoUrl: string;
+  };
+  current: StaffQueueEntry | null;
+  next: StaffQueueEntry | null;
+  canTakeBreak: boolean;
+};
+
 export class StaffApiError extends Error {
   constructor(readonly code: string, readonly status?: number) {
     super(code);
@@ -64,6 +76,29 @@ async function staffRequest<T>(pin: string, path: string, init?: RequestInit): P
 }
 
 export const getReceptionData = (pin: string) => staffRequest<ReceptionData>(pin, '/api/staff/reception');
+
+export const getBarberView = (pin: string, barberId: string) => staffRequest<BarberViewData>(
+  pin,
+  `/api/staff/barbers/${encodeURIComponent(barberId)}`,
+);
+
+export const startService = (pin: string, barberId: string) => staffRequest<{ updated: boolean }>(
+  pin,
+  `/api/staff/barbers/${encodeURIComponent(barberId)}/start`,
+  { method: 'POST' },
+);
+
+export const completeService = (pin: string, barberId: string) => staffRequest<{ updated: boolean }>(
+  pin,
+  `/api/staff/barbers/${encodeURIComponent(barberId)}/done`,
+  { method: 'POST' },
+);
+
+export const setBarberAvailability = (pin: string, barberId: string, status: 'Available' | 'On break') => staffRequest<{ updated: boolean }>(
+  pin,
+  `/api/staff/barbers/${encodeURIComponent(barberId)}/availability`,
+  { method: 'POST', body: JSON.stringify({ status }) },
+);
 
 export const callNextForBarber = (pin: string, barberId: string) => staffRequest<{ called: boolean; entryId: string }>(
   pin,

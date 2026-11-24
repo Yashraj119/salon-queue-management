@@ -38,6 +38,14 @@ type QueueRow = {
   created_at: string;
 };
 
+type DisplayQueueRow = {
+  id: string;
+  token: string;
+  barber_id: string | null;
+  status: QueueStatus;
+  called_at: string | null;
+};
+
 function getCurrentMinuteInIndia(): number {
   const parts = new Intl.DateTimeFormat('en-IN', {
     timeZone: 'Asia/Kolkata',
@@ -236,6 +244,104 @@ export function createPublicRouter(io: Server) {
       durationMinutes: service.duration_minutes,
       priceRupees: service.price_rupees,
     })) });
+  });
+
+  router.get('/display', (_request, response) => {
+    const barbers = database.prepare(`
+      SELECT b.id, b.name, b.status, b.photo_url,
+        q.id AS current_id, q.token AS current_token, q.status AS current_status,
+        q.called_at AS current_called_at
+      FROM barbers b
+      LEFT JOIN queue_entries q ON q.called_barber_id = b.id AND q.status IN ('Called', 'In chair')
+      WHERE b.is_on_duty = 1
+      ORDER BY b.name
+    `).all() as Array<{
+      id: string;
+      name: string;
+      status: BarberRow['status'];
+      photo_url: string;
+      current_id: string | null;
+      current_token: string | null;
+      current_status: 'Called' | 'In chair' | null;
+      current_called_at: string | null;
+    }>;
+    const waiting = database.prepare(`
+      SELECT q.id, q.token, q.barber_id, q.status, q.called_at
+      FROM queue_entries q WHERE q.status = 'Waiting' ORDER BY q.sequence
+    `).all() as DisplayQueueRow[];
+    const serviceDurations = database.prepare(`
+      SELECT queue_id, SUM(duration_minutes) AS minutes
+      FROM queue_entry_services GROUP BY queue_id
+    `).all() as Array<{ queue_id: string; minutes: number }>;
+    const durations = new Map(serviceDurations.map((row) => [row.queue_id, row.minutes]));
+    const workingBarberCount = barbers.filter((barber) => barber.status !== 'On break').length;
+    let minutesAhead = 0;
+    const upNext = waiting.slice(0, 5).map((entry) => {
+      const estimatedMinutes = workingBarberCount > 0 ? Math.ceil(minutesAhead / workingBarberCount) : null;
+      minutesAhead += durations.get(entry.id) ?? 0;
+      const preferredBarber = entry.barber_id
+        ? barbers.find((barber) => barber.id === entry.barber_id)?.name ?? null
+        : null;
+      return {
+        id: entry.id,
+        token: entry.token,
+        preferredBarberName: preferredBarber,
+        estimatedMinutes,
+      };
+    });
+
+    response.json({
+      salonName: getPublicState().salonName,
+      barbers: barbers.map((barber) => ({
+        id: barber.id,
+        name: barber.name,
+        status: barber.current_id ? 'Busy' : barber.status,
+        photoUrl: barber.photo_url,
+        current: barber.current_id && barber.current_token ? {
+          id: barber.current_id,
+          token: barber.current_token,
+          status: barber.current_status,
+          calledAt: barber.current_called_at,
+        } : null,
+      })),
+      upNext,
+      noWorkingBarbers: workingBarberCount === 0,
+    });
+  });
+
+  router.get('/queue-entries/:entryId', (request, response) => {
+    const entry = database.prepare(`
+      SELECT q.id, q.token, q.status, q.barber_id, q.called_barber_id,
+        preference.name AS preferred_barber_name, assigned.name AS assigned_barber_name,
+        preference.status AS preferred_barber_status
+      FROM queue_entries q
+      LEFT JOIN barbers preference ON preference.id = q.barber_id
+      LEFT JOIN barbers assigned ON assigned.id = q.called_barber_id
+      WHERE q.id = ? LIMIT 1
+    `).get(request.params.entryId) as {
+      id: string;
+      token: string;
+      status: QueueStatus;
+      barber_id: string | null;
+      called_barber_id: string | null;
+      preferred_barber_name: string | null;
+      assigned_barber_name: string | null;
+      preferred_barber_status: BarberRow['status'] | null;
+    } | undefined;
+    if (!entry) return response.status(404).json({ error: 'queue_entry_not_found' });
+
+    const services = database.prepare(`
+      SELECT service_name_en FROM queue_entry_services WHERE queue_id = ? ORDER BY service_id
+    `).all(entry.id) as Array<{ service_name_en: string }>;
+    response.json({
+      id: entry.id,
+      token: entry.token,
+      status: entry.status,
+      preferredBarberName: entry.preferred_barber_name,
+      assignedBarberName: entry.assigned_barber_name,
+      preferredBarberOnBreak: entry.barber_id !== null && entry.preferred_barber_status === 'On break',
+      services: services.map((service) => service.service_name_en),
+    });
   });
 
   router.post('/queue-entries', createQueueEntryHandler(io));

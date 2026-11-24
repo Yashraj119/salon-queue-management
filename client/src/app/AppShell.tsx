@@ -11,7 +11,7 @@ const pageLinks: { to: string; key: PageKey }[] = [
   { to: '/join', key: 'join' },
   { to: '/status/demo', key: 'status' },
   { to: '/reception', key: 'reception' },
-  { to: '/barber/demo', key: 'barber' },
+  { to: '/barber/amit', key: 'barber' },
   { to: '/display', key: 'display' },
   { to: '/admin', key: 'admin' },
 ];
@@ -36,11 +36,11 @@ function Brand() {
   );
 }
 
-function ScreensTaskbar({ display = false }: { display?: boolean }) {
+function ScreensTaskbar() {
   if (!import.meta.env.DEV) return null;
 
   return (
-    <nav className={`screens-taskbar${display ? ' screens-taskbar-display' : ''}`} aria-label={strings.navigation}>
+    <nav className="screens-taskbar" aria-label={strings.navigation}>
       {pageLinks.map(({ to, key }) => (
         <NavLink key={key} to={to} end={to === '/'}>
           {strings[key]}
@@ -80,7 +80,6 @@ export function AppShell() {
     return (
       <div className="app-canvas display-canvas">
         <Outlet />
-        <ScreensTaskbar display />
       </div>
     );
   }

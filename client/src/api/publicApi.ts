@@ -44,6 +44,35 @@ export type QueueEntryRequest = {
   barberId: string | null;
 };
 
+export type DisplayData = {
+  salonName: string;
+  barbers: Array<{
+    id: string;
+    name: string;
+    status: 'Available' | 'Busy' | 'On break';
+    photoUrl: string;
+    current: { id: string; token: string; status: 'Called' | 'In chair'; calledAt: string | null } | null;
+  }>;
+  upNext: Array<{
+    id: string;
+    token: string;
+    customerName: string;
+    preferredBarberName: string | null;
+    estimatedMinutes: number | null;
+  }>;
+  noWorkingBarbers: boolean;
+};
+
+export type CustomerQueueStatus = {
+  id: string;
+  token: string;
+  status: 'Waiting' | 'Called' | 'In chair' | 'Done' | 'Cancelled' | 'No-show';
+  preferredBarberName: string | null;
+  assignedBarberName: string | null;
+  preferredBarberOnBreak: boolean;
+  services: string[];
+};
+
 import { apiUrl } from './config';
 
 export class ApiError extends Error {
@@ -84,3 +113,8 @@ export const createQueueEntry = (entry: QueueEntryRequest) => requestJson<QueueE
   method: 'POST',
   body: JSON.stringify(entry),
 });
+
+export const getDisplayData = () => requestJson<DisplayData>('/api/display');
+export const getCustomerQueueStatus = (entryId: string) => requestJson<CustomerQueueStatus>(
+  `/api/queue-entries/${encodeURIComponent(entryId)}`,
+);

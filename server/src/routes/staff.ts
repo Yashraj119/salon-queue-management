@@ -189,6 +189,30 @@ export function createStaffRouter(io: Server) {
     });
   });
 
+  router.get('/barbers/:barberId', (request, response) => {
+    const barberId = request.params.barberId;
+    const barber = database.prepare(`
+      SELECT id, name, status, is_on_duty, photo_url
+      FROM barbers WHERE id = ? OR lower(name) = lower(?) LIMIT 1
+    `).get(barberId, barberId) as BarberRow | undefined;
+    if (!barber || barber.is_on_duty !== 1) return response.status(404).json({ error: 'barber_unavailable' });
+
+    const now = Date.now();
+    const current = getCurrentForBarber(barber.id);
+    const next = barber.status === 'On break' ? undefined : getCallCandidate(barber.id);
+    response.json({
+      barber: {
+        id: barber.id,
+        name: barber.name,
+        status: current?.status === 'In chair' ? 'Busy' : barber.status,
+        photoUrl: barber.photo_url,
+      },
+      current: current ? toStaffEntry(current, now) : null,
+      next: next ? toStaffEntry(next, now) : null,
+      canTakeBreak: !current,
+    });
+  });
+
   router.post('/barbers/:barberId/call-next', (request, response) => {
     const barberId = request.params.barberId;
     const result = withTransaction(() => {
@@ -217,6 +241,57 @@ export function createStaffRouter(io: Server) {
     if ('error' in result) return sendStaffActionError(response, result.status ?? 409, result.error ?? 'call_failed');
     io.emit('queue:changed');
     response.json({ called: true, entryId: result.entryId });
+  });
+
+  router.post('/barbers/:barberId/start', (request, response) => {
+    const barberId = request.params.barberId;
+    const result = withTransaction(() => {
+      const entry = getCurrentForBarber(barberId);
+      if (!entry || entry.status !== 'Called') return { error: 'start_not_allowed' as const };
+      if (!canTransitionQueueStatus(entry.status, 'In chair')) return { error: 'invalid_transition' as const };
+      database.prepare(`
+        UPDATE queue_entries SET status = 'In chair', started_at = ?
+        WHERE id = ? AND called_barber_id = ? AND status = 'Called'
+      `).run(new Date().toISOString(), entry.id, barberId);
+      database.prepare("UPDATE barbers SET status = 'Busy' WHERE id = ?").run(barberId);
+      return { updated: true } as const;
+    });
+    if ('error' in result) return sendStaffActionError(response, 409, result.error ?? 'start_not_allowed');
+    io.emit('queue:changed');
+    response.json(result);
+  });
+
+  router.post('/barbers/:barberId/done', (request, response) => {
+    const barberId = request.params.barberId;
+    const result = withTransaction(() => {
+      const entry = getCurrentForBarber(barberId);
+      if (!entry || entry.status !== 'In chair') return { error: 'done_not_allowed' as const };
+      if (!canTransitionQueueStatus(entry.status, 'Done')) return { error: 'invalid_transition' as const };
+      database.prepare("UPDATE queue_entries SET status = 'Done' WHERE id = ? AND called_barber_id = ? AND status = 'In chair'").run(entry.id, barberId);
+      database.prepare("UPDATE barbers SET status = 'Available' WHERE id = ?").run(barberId);
+      return { updated: true } as const;
+    });
+    if ('error' in result) return sendStaffActionError(response, 409, result.error ?? 'done_not_allowed');
+    io.emit('queue:changed');
+    response.json(result);
+  });
+
+  router.post('/barbers/:barberId/availability', (request, response) => {
+    const barberId = request.params.barberId;
+    const status = (request.body as { status?: unknown } | undefined)?.status;
+    if (status !== 'Available' && status !== 'On break') {
+      return sendStaffActionError(response, 400, 'invalid_availability');
+    }
+    const result = withTransaction(() => {
+      const barber = database.prepare('SELECT id, is_on_duty FROM barbers WHERE id = ?').get(barberId) as Pick<BarberRow, 'id' | 'is_on_duty'> | undefined;
+      if (!barber || barber.is_on_duty !== 1) return { error: 'barber_unavailable' as const, status: 404 };
+      if (status === 'On break' && getCurrentForBarber(barberId)) return { error: 'barber_occupied' as const, status: 409 };
+      database.prepare('UPDATE barbers SET status = ? WHERE id = ?').run(status, barberId);
+      return { updated: true } as const;
+    });
+    if ('error' in result) return sendStaffActionError(response, result.status ?? 409, result.error ?? 'availability_update_failed');
+    io.emit('queue:changed');
+    response.json(result);
   });
 
   router.post('/queue-entries/:entryId/no-show', (request, response) => {
