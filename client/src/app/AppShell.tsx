@@ -1,71 +1,118 @@
-import { useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { Languages } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
-import type { TranslationKey } from '../i18n/translations';
-import { useLanguage } from '../i18n/LanguageProvider';
+import { Scissors } from 'lucide-react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { strings } from '../strings';
+import type { PageKey } from '../strings';
 import { socket } from '../realtime/socket';
+import { useEffect } from 'react';
 
-const navigation: { to: string; label: TranslationKey }[] = [
-  { to: '/', label: 'home' },
-  { to: '/join', label: 'join' },
-  { to: '/status/demo', label: 'status' },
-  { to: '/reception', label: 'reception' },
-  { to: '/barber/demo', label: 'barber' },
-  { to: '/display', label: 'display' },
-  { to: '/admin', label: 'admin' },
+const pageLinks: { to: string; key: PageKey }[] = [
+  { to: '/', key: 'home' },
+  { to: '/join', key: 'join' },
+  { to: '/status/demo', key: 'status' },
+  { to: '/reception', key: 'reception' },
+  { to: '/barber/demo', key: 'barber' },
+  { to: '/display', key: 'display' },
+  { to: '/admin', key: 'admin' },
 ];
 
-export function AppShell({ children }: { children: ReactNode }) {
-  const { language, toggleLanguage, t } = useLanguage();
+function CombMark() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 28 24" className="comb-mark" fill="none">
+      <path d="M4 5.5h20v4H4zM6 9.5v9m4-9v9m4-9v9m4-9v9m4-9v9" />
+    </svg>
+  );
+}
+
+function Brand() {
+  return (
+    <Link to="/" className="brand-lockup" aria-label={strings.brand}>
+      <span className="brand-mark" aria-hidden="true">
+        <Scissors size={21} strokeWidth={1.5} />
+        <CombMark />
+      </span>
+      <span className="brand-name">{strings.brand}</span>
+    </Link>
+  );
+}
+
+function ScreensMenu() {
+  if (!import.meta.env.DEV) return null;
+
+  return (
+    <details className="screens-menu">
+      <summary>{strings.devScreens}</summary>
+      <nav className="screens-menu-panel" aria-label={strings.navigation}>
+        {pageLinks.map(({ to, key }) => (
+          <NavLink key={key} to={to} end={to === '/'}>
+            {strings[key]}
+          </NavLink>
+        ))}
+      </nav>
+    </details>
+  );
+}
+
+export function AppShell() {
+  const { pathname } = useLocation();
+  const isDisplay = pathname === '/display';
+  const isStaff = pathname === '/reception' || pathname.startsWith('/barber/') || pathname === '/admin';
+  const pageKey: PageKey = pathname === '/join'
+    ? 'join'
+    : pathname.startsWith('/status/')
+      ? 'status'
+      : pathname === '/reception'
+        ? 'reception'
+        : pathname.startsWith('/barber/')
+          ? 'barber'
+          : pathname === '/display'
+            ? 'display'
+            : pathname === '/admin'
+              ? 'admin'
+              : 'home';
 
   useEffect(() => {
-    document.documentElement.lang = language === 'gu' ? 'gu' : 'en';
-    document.title = t('brand');
-  }, [language, t]);
-
-  useEffect(() => {
+    document.title = strings.brand;
     socket.connect();
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  return (
-    <div className="min-h-screen bg-charcoal text-stone-100">
-      <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-5 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <span className="text-lg font-semibold tracking-wide text-gold">{t('brand')}</span>
-            <button
-              type="button"
-              onClick={toggleLanguage}
-              aria-label={t('languageToggle')}
-              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-gold/40 px-4 text-sm font-medium text-gold transition hover:bg-gold/10"
-            >
-              <Languages aria-hidden="true" size={17} />
-              <span>{language === 'en' ? t('gujaratiLanguage') : t('englishLanguage')}</span>
-            </button>
+  if (isDisplay) {
+    return (
+      <div className="app-canvas display-canvas">
+        <Outlet />
+      </div>
+    );
+  }
+
+  if (isStaff) {
+    return (
+      <div className="app-canvas staff-canvas">
+        <header className="staff-header">
+          <div className="staff-header-inner">
+            <div className="staff-heading-wrap">
+              <h1 className="staff-heading">{strings[pageKey]}</h1>
+              <span className="staff-badge">{strings.staffBadge}</span>
+            </div>
+            <ScreensMenu />
           </div>
-          <nav aria-label={t('mainNavigation')} className="flex gap-2 overflow-x-auto pb-1">
-            {navigation.map(({ to, label }) => (
-              <NavLink
-                key={label}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `whitespace-nowrap rounded-xl px-3 py-2 text-sm transition ${
-                    isActive ? 'bg-gold text-charcoal' : 'text-stone-300 hover:bg-white/10'
-                  }`
-                }
-              >
-                {t(label)}
-              </NavLink>
-            ))}
-          </nav>
+        </header>
+        <main className="page-main staff-main"><Outlet /></main>
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-canvas customer-canvas">
+      <header className="customer-header">
+        <div className="customer-header-inner">
+          <Brand />
+          <ScreensMenu />
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+      <main className="page-main customer-main"><Outlet /></main>
+      <div className="mobile-action-bar" aria-hidden="true" />
     </div>
   );
 }

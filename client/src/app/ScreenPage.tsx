@@ -1,13 +1,20 @@
-import type { TranslationKey } from '../i18n/translations';
-import { useLanguage } from '../i18n/LanguageProvider';
+import { useLocation } from 'react-router-dom';
+import { strings } from '../strings';
+import type { PageKey } from '../strings';
 
-export function ScreenPage({ titleKey }: { titleKey: TranslationKey }) {
-  const { t } = useLanguage();
+export function ScreenPage({ pageKey }: { pageKey: PageKey }) {
+  const { pathname } = useLocation();
+  const isDisplay = pageKey === 'display';
+  const subtitle = strings[`${pageKey}Subtitle`];
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-slate-800/70 p-5 shadow-xl shadow-black/10 sm:p-8">
-      <h1 className="text-2xl font-semibold tracking-tight text-stone-50 sm:text-3xl">{t(titleKey)}</h1>
-      <div aria-hidden="true" className="mt-6 min-h-48 rounded-2xl border border-dashed border-white/10 bg-charcoal/50" />
+    <section className={`screen-card${isDisplay ? ' screen-card-display' : ''}`} key={pathname}>
+      {isDisplay && <p className="display-kicker">{strings.brand}</p>}
+      <h1 className="screen-title">{strings[pageKey]}</h1>
+      <p className="screen-subtitle">{subtitle}</p>
+      <div className="gold-divider" role="img" aria-label={strings.ornament}>
+        <span />
+      </div>
     </section>
   );
 }
